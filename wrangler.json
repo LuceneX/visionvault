@@ -6,8 +6,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_id": "d8cd1b3d-5acb-4a4f-bea4-c543a76a3a89",
-      "database_name": "LuceneXAccounts"
+      "database_id": "dc8cc2aa-f96c-475c-961d-3a27d96462cc",
+      "database_name": "LuceneXAccounts-dev"
     }
   ],
   "env": {
