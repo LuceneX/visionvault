@@ -16,6 +16,11 @@ export const RegisterUserSchema = z.object({
   user_type: UserType
 });
 
+export const LoginUserSchema = z.object({
+  email: z.string().email().toLowerCase(),
+  password: z.string()
+});
+
 // Response types
 export interface User {
   id: string;
