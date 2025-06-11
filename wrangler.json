@@ -10,6 +10,9 @@
       "database_name": "LuceneXAccounts"
     }
   ],
+  "vars": {
+    "JWT_SECRET": "your-secret-key-here"
+  },
   "observability": {
     "enabled": true
   }
