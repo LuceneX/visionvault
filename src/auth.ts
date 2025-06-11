@@ -50,6 +50,19 @@ export async function registerUser(request: Request, env: Env): Promise<Response
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
+    console.error('Registration error:', error);
+    
+    // If it's a Zod validation error, return the validation details
+    if (error.errors) {
+      return new Response(JSON.stringify({ 
+        error: 'Validation failed',
+        details: error.errors
+      }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
     return new Response(JSON.stringify({ error: 'Invalid request' }), { 
       status: 400,
       headers: { 'Content-Type': 'application/json' }
