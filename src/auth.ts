@@ -1,36 +1,25 @@
 import { RegisterUserSchema, LoginUserSchema, type User, type XHashPass } from './types';
-import type { Env }   } catch (error: unknown) {
-    console.error('Registration error:', error);
-    
-    // Check if it's a Zod validation error
-    if (error && typeof error === 'object' && 'errors' in error) {
-      return new Response(JSON.stringify({ 
-        error: 'Validation failed',
-        details: error.errors
-      }), { 
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-    
-    // For other errors, return a generic message
-    return new Response(JSON.stringify({ error: 'Invalid request' }), { 
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }../types';
+import type { Env } from '../types';
+import { handleError } from './error-utils';
 
 export async function registerUser(request: Request, env: Env): Promise<Response> {
   try {
     // RECEIVE: Validate input
-    const body = await request.json();
+    const rawBody = await request.json();
+    
+    // Ensure email is lowercase before validation
+    const body = {
+      ...rawBody,
+      email: typeof rawBody.email === 'string' ? rawBody.email.toLowerCase() : rawBody.email
+    };
+    
     const validatedData = RegisterUserSchema.parse(body);
     const { full_name, email, password, user_type } = validatedData;
     
     // Check for existing user
     const existingUser = await env.DB.prepare(
       'SELECT id FROM users WHERE email = ?'
-    ).bind(email.toLowerCase()).first();
+    ).bind(email).first();
     
     if (existingUser) {
       return new Response(JSON.stringify({ error: 'User already exists' }), { 
@@ -69,23 +58,7 @@ export async function registerUser(request: Request, env: Env): Promise<Response
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    
-    // If it's a Zod validation error, return the validation details
-    if (error.errors) {
-      return new Response(JSON.stringify({ 
-        error: 'Validation failed',
-        details: error.errors
-      }), { 
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-    
-    return new Response(JSON.stringify({ error: 'Invalid request' }), { 
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return handleError(error);
   }
 }
 
