@@ -1,0 +1,16 @@
+{
+  "compatibility_date": "2025-04-01",
+  "main": "src/index.ts",
+  "name": "accounts",
+  "upload_source_maps": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "d8cd1b3d-5acb-4a4f-bea4-c543a76a3a89",
+      "database_name": "LuceneXAccounts"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
