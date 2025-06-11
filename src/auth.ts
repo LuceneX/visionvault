@@ -102,3 +102,50 @@ export async function getUser(request: Request, env: Env): Promise<Response> {
     });
   }
 }
+
+export async function loginUser(request: Request, env: Env): Promise<Response> {
+  try {
+    // RECEIVE: Get and validate login data
+    const { email, password } = await request.json();
+    
+    if (!email || !password) {
+      return new Response(JSON.stringify({ error: 'Email and password are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // STORE: Check credentials
+    const user = await env.DB.prepare(`
+      SELECT u.*, x.api_key, x.subscription_type 
+      FROM users u
+      LEFT JOIN XHashPass x ON u.id = x.user_id
+      WHERE u.email = ? AND u.password = ?
+    `).bind(email.toLowerCase(), password).first();
+
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // SEND: Return user data
+    return new Response(JSON.stringify({
+      id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      user_type: user.user_type,
+      api_key: user.api_key,
+      subscription_type: user.subscription_type
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
