@@ -2,17 +2,25 @@ import { RegisterUserSchema, LoginUserSchema, type User, type XHashPass } from '
 import type { Env } from '../types';
 import { handleError } from './error-utils';
 
+interface RequestBody {
+  full_name?: string;
+  email?: string;
+  password?: string;
+  user_type?: string;
+}
+
 export async function registerUser(request: Request, env: Env): Promise<Response> {
   try {
     // RECEIVE: Validate input
-    const rawBody = await request.json();
+    const rawBody = await request.json() as RequestBody;
     
     // Ensure email is lowercase before validation
     const body = {
       ...rawBody,
-      email: typeof rawBody.email === 'string' ? rawBody.email.toLowerCase() : rawBody.email
+      email: rawBody.email?.toLowerCase()
     };
     
+    // Validate the data
     const validatedData = RegisterUserSchema.parse(body);
     const { full_name, email, password, user_type } = validatedData;
     
