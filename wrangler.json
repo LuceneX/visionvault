@@ -10,6 +10,17 @@
       "database_name": "LuceneXAccounts"
     }
   ],
+  "env": {
+    "development": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_id": "dc8cc2aa-f96c-475c-961d-3a27d96462cc",
+          "database_name": "LuceneXAccounts-dev"
+        }
+      ]
+    }
+  },
   "vars": {
     "JWT_SECRET": "your-secret-key-here"
   },
