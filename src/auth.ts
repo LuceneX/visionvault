@@ -1,6 +1,5 @@
 import { 
-  RegisterUserSchema, 
-  LoginUserSchema, 
+  RegisterUserSchema,
   ApiKeyMetadata, 
   ErrorResponse,
   API_KEY_EXPIRATION,
@@ -80,9 +79,8 @@ export async function registerUser(request: Request, env: Env): Promise<Response
 
       // Generate JWT for initial session
       const token = await jwt.sign(
-        { userId, keyId },
-        env.JWT_SECRET,
-        { expiresIn: '1h' }
+        { userId, keyId, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, // 1 hour expiration
+        env.JWT_SECRET
       );
 
       return new Response(JSON.stringify({ 
