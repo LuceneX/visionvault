@@ -1,5 +1,24 @@
 import { RegisterUserSchema, LoginUserSchema, type User, type XHashPass } from './types';
-import type { Env } from '../types';
+import type { Env }   } catch (error: unknown) {
+    console.error('Registration error:', error);
+    
+    // Check if it's a Zod validation error
+    if (error && typeof error === 'object' && 'errors' in error) {
+      return new Response(JSON.stringify({ 
+        error: 'Validation failed',
+        details: error.errors
+      }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // For other errors, return a generic message
+    return new Response(JSON.stringify({ error: 'Invalid request' }), { 
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }../types';
 
 export async function registerUser(request: Request, env: Env): Promise<Response> {
   try {
