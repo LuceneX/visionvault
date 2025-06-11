@@ -1,4 +1,4 @@
-import { RegisterUserSchema, type User, type XHashPass } from './types';
+import { RegisterUserSchema, LoginUserSchema, type User, type XHashPass } from './types';
 import type { Env } from '../types';
 
 export async function registerUser(request: Request, env: Env): Promise<Response> {
@@ -106,14 +106,9 @@ export async function getUser(request: Request, env: Env): Promise<Response> {
 export async function loginUser(request: Request, env: Env): Promise<Response> {
   try {
     // RECEIVE: Get and validate login data
-    const { email, password } = await request.json();
-    
-    if (!email || !password) {
-      return new Response(JSON.stringify({ error: 'Email and password are required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
+    const body = await request.json();
+    const validatedData = LoginUserSchema.parse(body);
+    const { email, password } = validatedData;
 
     // STORE: Check credentials
     const user = await env.DB.prepare(`
