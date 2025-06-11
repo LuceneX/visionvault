@@ -107,7 +107,10 @@ export async function loginUser(request: Request, env: Env): Promise<Response> {
   try {
     // RECEIVE: Get and validate login data
     const body = await request.json();
-    const validatedData = LoginUserSchema.parse(body);
+    const validatedData = LoginUserSchema.parse({
+      ...body,
+      email: body.email?.toLowerCase() // Ensure email is lowercase before validation
+    });
     const { email, password } = validatedData;
 
     // STORE: Check credentials
