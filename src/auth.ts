@@ -180,3 +180,63 @@ export async function loginUser(request: Request, env: Env): Promise<Response> {
     return handleError(error);
   }
 }
+
+export async function verifyToken(request: Request, env: Env): Promise<Response> {
+  try {
+    // Get token from Authorization header
+    const authHeader = request.headers.get('Authorization');
+    const token = authHeader?.replace('Bearer ', '');
+    
+    if (!token) {
+      return new Response(JSON.stringify({ 
+        valid: false,
+        message: 'No token provided'
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Verify worker token
+    const workerToken = request.headers.get('X-Worker-Token');
+    if (workerToken !== env.WORKER_TOKEN) {
+      return new Response(JSON.stringify({ 
+        valid: false,
+        message: 'Unauthorized worker'
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // For now just validate that it's a UUID since we're using UUID as tokens
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(token)) {
+      return new Response(JSON.stringify({ 
+        valid: false,
+        message: 'Invalid token format'
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // In a real app, you would verify the token signature and expiry
+    // For now, we'll just return a success response
+    return new Response(JSON.stringify({
+      valid: true,
+      user: {
+        id: 'test-user-1',
+        email: 'test@example.com',
+        name: 'Test User',
+        emailVerified: true,
+        twoFactorEnabled: false
+      }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return handleError(error);
+  }
+}
