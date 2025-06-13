@@ -108,11 +108,8 @@ export async function getUser(request: Request, env: Env): Promise<Response> {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: 'Server error' }), { 
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+  } catch (error: unknown) {
+    return handleError(error);
   }
 }
 
