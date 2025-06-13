@@ -1,4 +1,4 @@
-import { registerUser, loginUser, getUser } from './auth';
+import { registerUser, loginUser, getUser, verifyToken } from './auth';
 import type { Env } from '../types';
 import { handleError } from './error-utils';
 
@@ -31,6 +31,8 @@ export default {
         response = await loginUser(request, env);
       } else if (url.pathname.startsWith('/user/') && request.method === 'GET') {
         response = await getUser(request, env);
+      } else if (url.pathname === '/auth/verify-token' && request.method === 'GET') {
+        response = await verifyToken(request, env);
       } else {
         response = new Response(JSON.stringify({ error: 'Not found' }), {
           status: 404,
