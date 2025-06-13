@@ -4,8 +4,8 @@ import { handleError } from './error-utils';
 
 interface RequestBody {
   full_name?: string;
-  email?: string;
-  password?: string;
+  email: string;
+  password: string;
   user_type?: string;
 }
 
