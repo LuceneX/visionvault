@@ -48,11 +48,17 @@ export default {
         statusText: response.statusText,
         headers: responseHeaders
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Server error:', error);
-      return new Response(JSON.stringify({ error: 'Server error' }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      const errorResponse = handleError(error);
+      // Add CORS headers to error response
+      const errorHeaders = new Headers(errorResponse.headers);
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorHeaders.set(key, value);
+      });
+      return new Response(errorResponse.body, {
+        status: errorResponse.status,
+        headers: errorHeaders
       });
     }
   }
