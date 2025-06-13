@@ -1,5 +1,6 @@
 import { registerUser, loginUser, getUser } from './auth';
 import type { Env } from '../types';
+import { handleError } from './error-utils';
 
 // CORS headers for all responses
 const corsHeaders = {
