@@ -127,11 +127,22 @@ export async function loginUser(request: Request, env: Env): Promise<Response> {
     }
 
     // RECEIVE: Get and validate login data
-    const body = await request.json() as RequestBody;
-    const validatedData = LoginUserSchema.parse({
-      ...body,
-      email: body.email?.toLowerCase() // Ensure email is lowercase before validation
-    });
+    const rawBody = await request.json() as RequestBody;
+    
+    if (!rawBody.email || !rawBody.password) {
+      return new Response(JSON.stringify({ error: 'Email and password are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Ensure email is lowercase before validation
+    const body = {
+      ...rawBody,
+      email: rawBody.email.toLowerCase()
+    };
+
+    const validatedData = LoginUserSchema.parse(body);
     const { email, password } = validatedData;
 
     // STORE: Check credentials
