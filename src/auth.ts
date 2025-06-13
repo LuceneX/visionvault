@@ -118,6 +118,17 @@ export async function getUser(request: Request, env: Env): Promise<Response> {
 
 export async function loginUser(request: Request, env: Env): Promise<Response> {
   try {
+    // Verify worker token
+    const authHeader = request.headers.get('Authorization');
+    const workerToken = authHeader?.replace('Bearer ', '');
+    
+    if (workerToken !== env.WORKER_TOKEN) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // RECEIVE: Get and validate login data
     const body = await request.json();
     const validatedData = LoginUserSchema.parse({
@@ -141,14 +152,18 @@ export async function loginUser(request: Request, env: Env): Promise<Response> {
       });
     }
 
-    // SEND: Return user data
+    // SEND: Return user data with success flag
     return new Response(JSON.stringify({
-      id: user.id,
-      full_name: user.full_name,
-      email: user.email,
-      user_type: user.user_type,
-      api_key: user.api_key,
-      subscription_type: user.subscription_type
+      success: true,
+      token: crypto.randomUUID(), // Simple token for testing
+      user: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        user_type: user.user_type,
+        api_key: user.api_key,
+        subscription_type: user.subscription_type
+      }
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
