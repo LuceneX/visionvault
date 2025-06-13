@@ -17,8 +17,8 @@ export const RegisterUserSchema = z.object({
 });
 
 export const LoginUserSchema = z.object({
-  email: z.string().email().toLowerCase(),
-  password: z.string()
+  email: z.string().email().toLowerCase().min(1, { message: "Email is required" }),
+  password: z.string().min(1, { message: "Password is required" })
 });
 
 // Response types
