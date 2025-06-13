@@ -22,7 +22,8 @@
     }
   },
   "vars": {
-    "JWT_SECRET": "your-secret-key-here"
+    "JWT_SECRET": "dev-jwt-secret-key",
+    "WORKER_TOKEN": "local-dev-token"
   },
   "observability": {
     "enabled": true
