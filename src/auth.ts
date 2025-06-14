@@ -132,6 +132,20 @@ export async function getUser(request: Request, env: Env): Promise<Response> {
     return handleError(error);
   }
 }
+      id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      user_type: user.user_type,
+      api_key: user.api_key,
+      subscription_type: user.subscription_type
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error: unknown) {
+    return handleError(error);
+  }
+}
 
 export async function loginUser(request: Request, env: Env): Promise<Response> {
   try {
