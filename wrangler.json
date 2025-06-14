@@ -5,11 +5,27 @@
   "upload_source_maps": true,
   "env": {
     "development": {
+      "vars": {
+        "JWT_SECRET": "dev-jwt-secret-key",
+        "REF_PUNK_URL": "http://localhost:8788" 
+      }
+    },
+    "staging": {
+      "vars": {
+        "JWT_SECRET": "staging-jwt-secret-needs-to-be-set-as-secret",
+        "REF_PUNK_URL": "https://ref-punk-staging.yourdomain.workers.dev"
+      }
+    },
+    "production": {
+      "vars": {
+        "JWT_SECRET": "production-jwt-secret-needs-to-be-set-as-secret",
+        "REF_PUNK_URL": "https://ref-punk.yourdomain.workers.dev"
+      }
     }
   },
   "vars": {
     "JWT_SECRET": "dev-jwt-secret-key",
-    "REF_PUNK_URL": "https://your-ref-punk-worker-url.yourdomain.workers.dev"
+    "REF_PUNK_URL": "http://localhost:8788"
   },
   "observability": {
     "enabled": true
