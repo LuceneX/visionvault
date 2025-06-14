@@ -53,11 +53,11 @@ class ApiClient {
       }
 
       const response = await fetch(`${this.env.REF_PUNK_URL}${endpoint}`, requestOptions);
-      const responseData = await response.json();
+      const responseData = await response.json() as any;
 
       return {
         status: response.status,
-        data: responseData,
+        data: responseData as T,
         error: responseData.error,
       };
     } catch (error: any) {
