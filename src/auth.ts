@@ -80,24 +80,44 @@ export async function getUser(request: Request, env: Env): Promise<Response> {
       });
     }
 
-    // RECEIVE & STORE: Get user data
-    const stmt = env.DB.prepare(`
-      SELECT u.id, u.full_name, u.email, u.user_type, x.api_key, x.subscription_type
-      FROM users u 
-      LEFT JOIN XHashPass x ON u.id = x.user_id 
-      WHERE u.id = ?
-    `);
+    // Get user data via ref-punk API
+    const apiClient = createApiClient(env);
+    const userResponse = await apiClient.getUser(userId);
     
-    const user = await stmt.bind(userId).first();
-    if (!user) {
+    if (userResponse.status !== 200 || userResponse.error) {
+      return new Response(JSON.stringify({ 
+        error: userResponse.error || 'Failed to retrieve user'
+      }), { 
+        status: userResponse.status || 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (!Array.isArray(userResponse.data) || userResponse.data.length === 0) {
       return new Response(JSON.stringify({ error: 'User not found' }), { 
         status: 404,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
+    const user = userResponse.data[0];
+
     // SEND: Return user data
     return new Response(JSON.stringify({
+      id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      user_type: user.user_type,
+      api_key: user.api_key,
+      subscription_type: user.subscription_type
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error: unknown) {
+    return handleError(error);
+  }
+}
       id: user.id,
       full_name: user.full_name,
       email: user.email,
