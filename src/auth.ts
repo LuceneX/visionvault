@@ -1,6 +1,7 @@
 import { RegisterUserSchema, LoginUserSchema, type User, type XHashPass } from './types';
 import type { Env } from '../types';
 import { handleError } from './error-utils';
+import { createApiClient } from './api-client';
 
 interface RequestBody {
   full_name?: string;
@@ -24,43 +25,42 @@ export async function registerUser(request: Request, env: Env): Promise<Response
     const validatedData = RegisterUserSchema.parse(body);
     const { full_name, email, password, user_type } = validatedData;
     
-    // Check for existing user
-    const existingUser = await env.DB.prepare(
-      'SELECT id FROM users WHERE email = ?'
-    ).bind(email).first();
+    // Check for existing user via ref-punk API
+    const apiClient = createApiClient(env);
+    const userResponse = await apiClient.getUser(undefined, email);
     
-    if (existingUser) {
+    if (userResponse.status === 200 && Array.isArray(userResponse.data) && userResponse.data.length > 0) {
       return new Response(JSON.stringify({ error: 'User already exists' }), { 
         status: 409,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // STORE: Create records
+    // STORE: Create records via ref-punk API
     const userId = crypto.randomUUID();
-    const xhashId = crypto.randomUUID();
-    const apiKey = crypto.randomUUID();
-
-    // Store user and XHashPass in a transaction
-    const stmt = env.DB.prepare(`
-      INSERT INTO users (id, full_name, email, password, user_type) 
-      VALUES (?, ?, ?, ?, ?)`
-    );
     
-    const xhashStmt = env.DB.prepare(`
-      INSERT INTO XHashPass (id, user_id, subscription_type, api_key) 
-      VALUES (?, ?, 'Free', ?)`
-    );
+    const createResponse = await apiClient.createUser({
+      id: userId,
+      full_name,
+      email,
+      password,
+      user_type: user_type || 'User',
+      subscription_type: 'Free'
+    });
 
-    await env.DB.batch([
-      stmt.bind(userId, full_name, email, password, user_type),
-      xhashStmt.bind(xhashId, userId, apiKey)
-    ]);
+    if (createResponse.status !== 201 || createResponse.error) {
+      return new Response(JSON.stringify({ 
+        error: createResponse.error || 'Failed to create user'
+      }), { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     // SEND: Return created data
     return new Response(JSON.stringify({ 
       id: userId,
-      api_key: apiKey 
+      api_key: createResponse.data.api_key 
     }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' }
