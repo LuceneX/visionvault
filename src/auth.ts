@@ -165,15 +165,21 @@ export async function loginUser(request: Request, env: Env): Promise<Response> {
     const validatedData = LoginUserSchema.parse(body);
     const { email, password } = validatedData;
 
-    // STORE: Check credentials
-    const user = await env.DB.prepare(`
-      SELECT u.*, x.api_key, x.subscription_type 
-      FROM users u
-      LEFT JOIN XHashPass x ON u.id = x.user_id
-      WHERE u.email = ? AND u.password = ?
-    `).bind(email.toLowerCase(), password).first();
+    // STORE: Check credentials via ref-punk API
+    const apiClient = createApiClient(env);
+    const userResponse = await apiClient.getUser(undefined, email.toLowerCase());
+    
+    if (userResponse.status !== 200 || !Array.isArray(userResponse.data) || userResponse.data.length === 0) {
+      return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
-    if (!user) {
+    const user = userResponse.data[0];
+    
+    // Verify password
+    if (user.password !== password) {
       return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
