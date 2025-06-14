@@ -7,25 +7,29 @@
     "development": {
       "vars": {
         "JWT_SECRET": "dev-jwt-secret-key",
-        "REF_PUNK_URL": "http://localhost:8788" 
+        "REF_PUNK_URL": "http://localhost:8788",
+        "WORKER_TOKEN": "dev-worker-token-for-internal-use"
       }
     },
     "staging": {
       "vars": {
         "JWT_SECRET": "staging-jwt-secret-needs-to-be-set-as-secret",
-        "REF_PUNK_URL": "https://ref-punk-staging.yourdomain.workers.dev"
+        "REF_PUNK_URL": "https://ref-punk-staging.yourdomain.workers.dev",
+        "WORKER_TOKEN": "staging-worker-token-needs-to-be-set-as-secret"
       }
     },
     "production": {
       "vars": {
         "JWT_SECRET": "production-jwt-secret-needs-to-be-set-as-secret",
-        "REF_PUNK_URL": "https://ref-punk.yourdomain.workers.dev"
+        "REF_PUNK_URL": "https://ref-punk.yourdomain.workers.dev",
+        "WORKER_TOKEN": "production-worker-token-needs-to-be-set-as-secret"
       }
     }
   },
   "vars": {
     "JWT_SECRET": "dev-jwt-secret-key",
-    "REF_PUNK_URL": "http://localhost:8788"
+    "REF_PUNK_URL": "http://localhost:8788",
+    "WORKER_TOKEN": "dev-worker-token-for-internal-use"
   },
   "observability": {
     "enabled": true
