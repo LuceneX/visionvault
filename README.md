@@ -42,12 +42,76 @@ This service no longer directly accesses the D1 database. It now acts as a servi
 
 ## Deployment Instructions
 
-### Setting up Environment Variables
+The deployment process has been streamlined with a deployment script that handles setting up secrets and deploying the workers.
 
-For each environment, you'll need to set up the proper configuration:
+### Using the Deployment Script
+
+The deployment script (`deploy.sh`) provides an interactive way to deploy the workers:
+
+```bash
+# Make the script executable if needed
+chmod +x deploy.sh
+
+# Run the deployment script
+./deploy.sh
+```
+
+The script will guide you through:
+1. Selecting the environment (development, staging, production)
+2. Choosing which workers to deploy (ref-punk, accounts, xhashpass)
+3. Setting up secrets (REF_PUNK_API_TOKEN, JWT_SECRET, etc.)
+4. Updating the REF_PUNK_URL in all workers
+5. Deploying the selected workers
+
+### Manual Setup for Each Environment
+
+If you prefer to set things up manually:
 
 1. **Development Environment**:
 ```bash
+# Set the REF_PUNK_API_TOKEN secret
+wrangler secret put REF_PUNK_API_TOKEN --env development
+
+# Run the development server
+wrangler dev --env development
+```
+
+2. **Staging/Production Environment**:
+```bash
+# Set the REF_PUNK_API_TOKEN secret
+wrangler secret put REF_PUNK_API_TOKEN --env staging
+
+# Set the JWT_SECRET for secure token generation
+wrangler secret put JWT_SECRET --env staging
+
+# Set the WORKER_TOKEN for inter-worker authentication
+wrangler secret put WORKER_TOKEN --env staging
+
+# Deploy the worker
+wrangler deploy --env staging
+```
+
+## Secure Architecture Design
+
+This service follows a secure architecture design where:
+
+1. Only the ref-punk worker has direct access to the D1 database
+2. All communication between workers is authenticated with API tokens
+3. All external requests are rate-limited and validated
+4. Secrets are managed securely and not checked into version control
+
+### Database Security
+
+- The D1 database is only accessible through the ref-punk worker
+- All database operations are authenticated with the REF_PUNK_API_TOKEN
+- No direct database access from outside the Cloudflare Workers environment
+
+### API Security
+
+- All API endpoints require authentication
+- Rate limiting is applied to prevent abuse
+- Input validation is performed on all requests
+- Proper error handling to prevent information leakage
 # Configure the local development URL
 wrangler secret put REF_PUNK_API_TOKEN --env development
 ```
