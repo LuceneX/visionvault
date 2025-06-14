@@ -1,103 +1,84 @@
-# Worker + D1 Database
-
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/d1-template)
-
-![Worker + D1 Template Preview](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/cb7cb0a9-6102-4822-633c-b76b7bb25900/public)
-
-<!-- dash-content-start -->
-
-D1 is Cloudflare's native serverless SQL database ([docs](https://developers.cloudflare.com/d1/)). This project demonstrates using a Worker with a D1 binding to execute a SQL statement. A simple frontend displays the result of this query:
-
-```SQL
-SELECT * FROM comments LIMIT 3;
-```
-
-The D1 database is initialized with a `comments` table and this data:
-
-```SQL
-INSERT INTO comments (author, content)
-VALUES
-    ('Kristian', 'Congrats!'),
-    ('Serena', 'Great job!'),
-    ('Max', 'Keep up the good work!')
-;
-```
-
-> [!IMPORTANT]
-> When using C3 to create this project, select "no" when it asks if you want to deploy. You need to follow this project's [setup steps](https://github.com/cloudflare/templates/tree/main/d1-template#setup-steps) before deploying.
-
-<!-- dash-content-end -->
-
-## Getting Started
-
-Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
-
-```
-npm create cloudflare@latest -- --template=cloudflare/templates/d1-template
-```
-
-A live public deployment of this template is available at [https://d1-template.templates.workers.dev](https://d1-template.templates.workers.dev)
-
-## Setup Steps
-
-1. Install the project dependencies with a package manager of your choice:
-   ```bash
-   npm install
-   ```
-2. Create a [D1 database](https://developers.cloudflare.com/d1/get-started/) with the name "d1-template-database":
-   ```bash
-   npx wrangler d1 create d1-template-database
-   ```
-   ...and update the `database_id` field in `wrangler.json` with the new database ID.
-3. Run the following db migration to initialize the database (notice the `migrations` directory in this project):
-   ```bash
-   npx wrangler d1 migrations apply --remote d1-template-database
-   ```
-4. Deploy the project!
-   ```bash
-   npx wrangler deploy
-   ```
-
 # LuceneX Accounts Database Service
 
 A minimalist Cloudflare D1 database service for user account management. This service follows the principle of single responsibility, focusing on three core operations:
 
 1. RECEIVE: Validate and accept user data
-2. STORE: Save data in D1 database
+2. STORE: Save data in D1 database through the ref-punk worker
 3. SEND: Return stored data when requested
 
-## Worker Architecture
+## Updated Worker Architecture
 
-This is the DATABASE WORKER in your multi-worker setup:
+This service no longer directly accesses the D1 database. It now acts as a service layer that communicates with the `ref-punk` worker which has the actual database binding.
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│                 │     │                 │     │    DATABASE      │
-│   AUTH WORKER   │────▶│   API WORKER    │────▶│     WORKER      │
-│                 │     │                 │     │   (this repo)    │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                                                        │
-                                                        ▼
-                                                ┌─────────────────┐
-                                                │       D1        │
-                                                │    DATABASE     │
-                                                └─────────────────┘
-
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│                 │     │                 │     │                 │     │                 │
+│   XHASHPASS     │────▶│  ACCOUNTS WORKER│────▶│   REF-PUNK      │────▶│       D1        │
+│    WORKER       │     │   (this repo)   │     │     WORKER      │     │    DATABASE     │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
+                               ▲
+                               │
+┌─────────────────┐            │
+│                 │            │
+│ EXTERNAL CLIENTS│────────────┘
+│                 │
+└─────────────────┘
 ```
 
 ### Worker Responsibilities:
-- **This Worker (Database)**: Handles all database operations
-  - URL: `accounts.lucenex.workers.dev`
-  - Role: Database interface
-  - Operations: Create/Read user data
+- **REF-PUNK Worker**: Database Gatekeeper
+  - Has direct binding to D1 database
+  - Authenticates requests with REF_PUNK_API_TOKEN
+  - Exposes secure API endpoints for database operations
 
-- **Auth Worker**: Handles authentication
-  - Hashes passwords
-  - Validates credentials
-  - Issues tokens
-  - Calls this worker at: `accounts.lucenex.workers.dev/register`
+- **This Worker (Accounts)**: Service Layer
+  - Validates user input
+  - Calls ref-punk for database operations
+  - Handles authentication and user management
 
-- **API Worker**: Handles API requests
+- **XHashPass Worker**: Client service
+  - Uses this worker's API for user-related operations
+  - Communicates with ref-punk for XHashPass specific data
+
+## Deployment Instructions
+
+### Setting up Environment Variables
+
+For each environment, you'll need to set up the proper configuration:
+
+1. **Development Environment**:
+```bash
+# Configure the local development URL
+wrangler secret put REF_PUNK_API_TOKEN --env development
+```
+
+2. **Staging Environment**:
+```bash
+# Deploy to staging
+wrangler deploy --env staging
+
+# Configure the staging secrets
+wrangler secret put REF_PUNK_API_TOKEN --env staging
+wrangler secret put JWT_SECRET --env staging
+```
+
+3. **Production Environment**:
+```bash
+# Deploy to production
+wrangler deploy --env production
+
+# Configure the production secrets
+wrangler secret put REF_PUNK_API_TOKEN --env production
+wrangler secret put JWT_SECRET --env production
+```
+
+### Important Configuration Notes
+
+1. The `REF_PUNK_URL` values in `wrangler.json` must be updated to your actual deployed URLs for the ref-punk worker.
+
+2. All workers that need to communicate with the ref-punk worker must use the same `REF_PUNK_API_TOKEN` value.
+
+3. All JWT operations must use the same `JWT_SECRET` value across your worker ecosystem.
   - Manages rate limiting
   - Routes requests
   - Handles API key validation
