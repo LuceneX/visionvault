@@ -14,6 +14,8 @@ CREATE TABLE XHashPass (
     user_id TEXT NOT NULL,
     subscription_type TEXT NOT NULL,
     api_key TEXT NOT NULL,
+    rate_limit INTEGER,
+    allow_report BOOLEAN,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
