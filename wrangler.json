@@ -28,6 +28,9 @@
       }
     },
     "production": {
+      "routes": [
+        "visionvault.lucenex.lv/*"
+      ],
       "vars": {
         "JWT_SECRET": "production-jwt-secret-needs-to-be-set-as-secret",
         "REF_PUNK_URL": "ref-punk.lucenex.lv",
