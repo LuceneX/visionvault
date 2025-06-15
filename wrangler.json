@@ -18,6 +18,9 @@
       }
     },
     "staging": {
+      "routes": [
+        "visionvault-staging.lucenex.lv/*"
+      ],
       "vars": {
         "JWT_SECRET": "staging-jwt-secret-needs-to-be-set-as-secret",
         "REF_PUNK_URL": "https://ref-punk-staging.yourdomain.workers.dev",
