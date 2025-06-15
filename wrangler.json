@@ -1,7 +1,7 @@
 {
   "compatibility_date": "2025-04-01",
   "main": "src/index.ts",
-  "name": "accounts",
+  "name": "visionvault",
   "upload_source_maps": true,
   "env": {
     "development": {
