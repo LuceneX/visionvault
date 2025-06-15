@@ -3,6 +3,9 @@
   "main": "src/index.ts",
   "name": "visionvault",
   "upload_source_maps": true,
+  "routes": [
+    "visionvault.lucenex.lv/*"
+  ],
   "env": {
     "development": {
       "vars": {
