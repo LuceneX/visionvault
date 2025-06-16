@@ -6,6 +6,13 @@
   "routes": [
     "visionvault.lucenex.lv/*"
   ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "visionvault",
+      "database_id": "abcd1234-e5f6-789g-hijk-lmnopqrstuvw"
+    }
+  ],
   "env": {
     "development": {
       "routes": [
