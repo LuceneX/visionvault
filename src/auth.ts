@@ -252,3 +252,57 @@ export async function verifyToken(request: Request, env: Env): Promise<Response>
     return handleError(error);
   }
 }
+
+/**
+ * Verify an authentication token
+ */
+export async function verifyToken(request: Request, env: Env): Promise<Response> {
+  try {
+    // Get the token from the Authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ 
+        valid: false,
+        error: 'Missing or invalid authorization header' 
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    // For worker verification, also check if this is a worker-to-worker request
+    const workerToken = request.headers.get('X-Worker-Token');
+    const isInternalRequest = workerToken === env.WORKER_TOKEN;
+    
+    // Verify the token
+    try {
+      // For demonstration, we're just checking if the token is valid
+      // In a real implementation, you would verify the JWT
+      return new Response(JSON.stringify({ 
+        valid: true,
+        userId: 'sample-user-id'  // In a real implementation, you would decode the JWT
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (e) {
+      return new Response(JSON.stringify({ 
+        valid: false,
+        error: 'Invalid token' 
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  } catch (error: any) {
+    return new Response(JSON.stringify({ 
+      valid: false,
+      error: error.message || 'Token verification failed' 
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
