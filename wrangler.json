@@ -36,7 +36,8 @@
       "vars": {
         "JWT_SECRET": "production-jwt-secret-needs-to-be-set-as-secret",
         "REF_PUNK_URL": "ref-punk.lucenex.lv",
-        "WORKER_TOKEN": "production-worker-token-needs-to-be-set-as-secret"
+        "WORKER_TOKEN": "production-worker-token-needs-to-be-set-as-secret",
+        "REF_PUNK_API_TOKEN": "production-ref-punk-api-token-needs-to-be-set-as-secret"
       }
     }
   },
