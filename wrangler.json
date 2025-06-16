@@ -6,13 +6,6 @@
   "routes": [
     "visionvault.lucenex.lv/*"
   ],
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "visionvault",
-      "database_id": "abcd1234-e5f6-789g-hijk-lmnopqrstuvw"
-    }
-  ],
   "env": {
     "development": {
       "routes": [
@@ -20,7 +13,9 @@
       ],
       "vars": {
         "JWT_SECRET": "dev-jwt-secret-key",
-        "WORKER_TOKEN": "dev-worker-token-for-internal-use"
+        "REF_PUNK_URL": "http://localhost:8788",
+        "WORKER_TOKEN": "dev-worker-token-for-internal-use",
+        "DATABASE_API_KEY": ""
       }
     },
     "staging": {
@@ -29,7 +24,9 @@
       ],
       "vars": {
         "JWT_SECRET": "staging-jwt-secret-needs-to-be-set-as-secret",
-        "WORKER_TOKEN": "staging-worker-token-needs-to-be-set-as-secret"
+        "REF_PUNK_URL": "https://ref-punk-staging.yourdomain.workers.dev",
+        "WORKER_TOKEN": "staging-worker-token-needs-to-be-set-as-secret",
+        "DATABASE_API_KEY": ""
       }
     },
     "production": {
@@ -38,12 +35,15 @@
       ],
       "vars": {
         "JWT_SECRET": "production-jwt-secret-needs-to-be-set-as-secret",
-        "WORKER_TOKEN": "production-worker-token-needs-to-be-set-as-secret"
+        "REF_PUNK_URL": "ref-punk.lucenex.lv",
+        "WORKER_TOKEN": "production-worker-token-needs-to-be-set-as-secret",
+        "DATABASE_API_KEY": ""
       }
     }
   },
   "vars": {
     "JWT_SECRET": "dev-jwt-secret-key",
+    "REF_PUNK_URL": "http://localhost:8788",
     "WORKER_TOKEN": "dev-worker-token-for-internal-use"
   },
   "observability": {
