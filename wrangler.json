@@ -13,9 +13,7 @@
       ],
       "vars": {
         "JWT_SECRET": "dev-jwt-secret-key",
-        "REF_PUNK_URL": "http://localhost:8788",
-        "WORKER_TOKEN": "dev-worker-token-for-internal-use",
-        "REF_PUNK_API_TOKEN": "dev-ref-punk-api-token"
+        "WORKER_TOKEN": "dev-worker-token-for-internal-use"
       }
     },
     "staging": {
@@ -24,9 +22,7 @@
       ],
       "vars": {
         "JWT_SECRET": "staging-jwt-secret-needs-to-be-set-as-secret",
-        "REF_PUNK_URL": "https://ref-punk-staging.yourdomain.workers.dev",
-        "WORKER_TOKEN": "staging-worker-token-needs-to-be-set-as-secret",
-        "REF_PUNK_API_TOKEN": "staging-ref-punk-api-token-needs-to-be-set-as-secret"
+        "WORKER_TOKEN": "staging-worker-token-needs-to-be-set-as-secret"
       }
     },
     "production": {
@@ -35,17 +31,13 @@
       ],
       "vars": {
         "JWT_SECRET": "production-jwt-secret-needs-to-be-set-as-secret",
-        "REF_PUNK_URL": "ref-punk.lucenex.lv",
-        "WORKER_TOKEN": "production-worker-token-needs-to-be-set-as-secret",
-        "REF_PUNK_API_TOKEN": "production-ref-punk-api-token-needs-to-be-set-as-secret"
+        "WORKER_TOKEN": "production-worker-token-needs-to-be-set-as-secret"
       }
     }
   },
   "vars": {
     "JWT_SECRET": "dev-jwt-secret-key",
-    "REF_PUNK_URL": "http://localhost:8788",
-    "WORKER_TOKEN": "dev-worker-token-for-internal-use",
-    "REF_PUNK_API_TOKEN": "dev-ref-punk-api-token"
+    "WORKER_TOKEN": "dev-worker-token-for-internal-use"
   },
   "observability": {
     "enabled": true
